@@ -9,10 +9,10 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import per.xiaozhi.pojo.Clazz;
+import per.xiaozhi.pojo.Grade;
 import per.xiaozhi.service.ClazzService;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +32,7 @@ public class ClazzController {
     }
 
 
-    @PostMapping("/getAllClazzList")
+    @RequestMapping("/getAllClazzList")
     @ResponseBody
     public Map<String, Object> getAllClazzList(Integer page, Integer limit) {
 
@@ -61,11 +61,10 @@ public class ClazzController {
      * @param: username 管理员姓名
      * @return: java.util.Map<java.lang.String, java.lang.Object>
      */
-    @PostMapping("/getClazzList")
+    @RequestMapping("/getClazzList")
     @ResponseBody
     public Map<String, Object> getClazzList(Integer page, Integer limit, String name,String gradeName) {
 
-        //获取查询的用户名
         Clazz clazz = new Clazz();
         clazz.setName(name);
         clazz.setGradeName(gradeName);
@@ -87,10 +86,10 @@ public class ClazzController {
         return result;
     }
 
+
     @RequestMapping("/addClazz")
-    public String addClazz() {
-        Clazz clazz = new Clazz();
-        //todo
+    public String addClazz(String name, Integer number,String teacherName,String telephone,String email, String introduction,String gradeName) {
+        Clazz clazz = new Clazz(name,number,introduction,teacherName,telephone,email,gradeName);
         int count = clazzService.insert(clazz);
         //存储对象数据
        if (count>0){
@@ -100,9 +99,8 @@ public class ClazzController {
     }
 
     @RequestMapping("/editClazz")
-    public String editClazz(Integer id) {
-        Clazz clazz = new Clazz();
-        //todo
+    public String editClazz(Integer id,String name, Integer number,String teacherName,String telephone,String email, String introduction,String gradeName) {
+        Clazz clazz = new Clazz(id,name,number,introduction,teacherName,telephone,email,gradeName);
         int count = clazzService.update(clazz);
         //存储对象数据
         if (count>0){
@@ -111,7 +109,7 @@ public class ClazzController {
         return "error/404";
     }
 
-    @PostMapping("/delete")
+    @RequestMapping("/delete")
     @ResponseBody
     public Map<String, Object>delete(Integer id) {
         int i = clazzService.deleteById(id);
@@ -120,6 +118,23 @@ public class ClazzController {
             result.put("code",200);
             result.put("msg","删除成功!");
         }
+        return result;
+    }
+
+
+    /*
+     *Created by IntelliJ IDEA
+     * @description:获取不分页的班级列表
+     * @date: 2019/12/26-17:34
+     * @auther: xiaozhi
+     *
+     */
+    @RequestMapping("/getAll")
+    @ResponseBody
+    public Map<String, Object> getAll() {
+        List<Clazz> list = clazzService.selectAll();
+        result.put("msg","查询成功!");
+        result.put("data", list);
         return result;
     }
 

@@ -33,22 +33,6 @@
         </where>
     </select>
 
-    <!-- 根据学号查询指定学生信息 -->
-    <select id="findBySno" resultType="student" parameterType="student">
-        SELECT id,
-               sno,
-               name,
-               gender,
-               password,
-               portraitPath,
-               email,
-               telephone,
-               address,
-               introduction,
-               clazzName
-        FROM ssm_student.tb_student
-        WHERE sno = #{sno}
-    </select>
 
     <!-- 添加学生信息 -->
     <insert id="insert" parameterType="student">
@@ -60,6 +44,7 @@
     <update id="update" parameterType="student">
         UPDATE ssm_student.tb_student
         <set>
+            <if test="sno!=null and sno!=''">sno=#{sno},</if>
             <if test="name!=null and name!=''">name=#{name},</if>
             <if test="gender!=null and gender!=''">gender=#{gender},</if>
             <if test="password!=null and password!=''">password=#{password},</if>

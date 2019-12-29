@@ -27,10 +27,6 @@ public class StudentServiceImpl implements StudentService {
         return studentMapper.selectList(student);
     }
 
-    @Override
-    public Student fingBySno(Student student) {
-        return studentMapper.findBySno(student);
-    }
 
     @Override
     public int insert(Student student) {

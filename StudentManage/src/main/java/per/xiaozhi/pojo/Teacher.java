@@ -96,4 +96,32 @@ public class Teacher {
     public void setClazzName(String clazzName) {
         this.clazzName = clazzName;
     }
+
+    public Teacher(String tno, String name, String gender, String password, String email, String telephone, String address, String portraitPath, String clazzName) {
+        this.tno = tno;
+        this.name = name;
+        this.gender = gender;
+        this.password = password;
+        this.email = email;
+        this.telephone = telephone;
+        this.address = address;
+        this.portraitPath = portraitPath;
+        this.clazzName = clazzName;
+    }
+
+    public Teacher(Integer id, String tno, String name, String gender, String password, String email, String telephone, String address, String portraitPath, String clazzName) {
+        this.id = id;
+        this.tno = tno;
+        this.name = name;
+        this.gender = gender;
+        this.password = password;
+        this.email = email;
+        this.telephone = telephone;
+        this.address = address;
+        this.portraitPath = portraitPath;
+        this.clazzName = clazzName;
+    }
+
+    public Teacher() {
+    }
 }

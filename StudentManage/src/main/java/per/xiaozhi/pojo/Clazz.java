@@ -79,4 +79,28 @@ public class Clazz {
     public void setGradeName(String gradeName) {
         this.gradeName = gradeName;
     }
+
+    public Clazz(Integer id, String name, Integer number, String introduction, String teacherName, String telephone, String email, String gradeName) {
+        this.id = id;
+        this.name = name;
+        this.number = number;
+        this.introduction = introduction;
+        this.teacherName = teacherName;
+        this.telephone = telephone;
+        this.email = email;
+        this.gradeName = gradeName;
+    }
+
+    public Clazz(String name, Integer number, String introduction, String teacherName, String telephone, String email, String gradeName) {
+        this.name = name;
+        this.number = number;
+        this.introduction = introduction;
+        this.teacherName = teacherName;
+        this.telephone = telephone;
+        this.email = email;
+        this.gradeName = gradeName;
+    }
+
+    public Clazz() {
+    }
 }

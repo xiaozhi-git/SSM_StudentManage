@@ -60,4 +60,24 @@ public class Grade {
     public void setIntroduction(String introduction) {
         this.introduction = introduction;
     }
+
+    public Grade(Integer id, String name, String manager, String email, String telephone, String introduction) {
+        this.id = id;
+        this.name = name;
+        this.manager = manager;
+        this.email = email;
+        this.telephone = telephone;
+        this.introduction = introduction;
+    }
+
+    public Grade(String name, String manager, String email, String telephone, String introduction) {
+        this.name = name;
+        this.manager = manager;
+        this.email = email;
+        this.telephone = telephone;
+        this.introduction = introduction;
+    }
+
+    public Grade() {
+    }
 }

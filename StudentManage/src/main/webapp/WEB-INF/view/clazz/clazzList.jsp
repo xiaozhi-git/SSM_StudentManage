@@ -17,7 +17,7 @@
                 <label class="layui-form-label">年级 :</label>
                 <div class="layui-input-block" >
                     <select id="grade" name="grade" lay-filter="grade" style="width: 190px;height:37px; border: 1px solid gold">
-                        <option value="17级">请选择:</option>
+                        <option value="">请选择:</option>
                     </select>
                 </div>
         </div>
@@ -63,14 +63,15 @@
                 toolbar:'#head_toolbar',
                 method:'post',
                 cols:[[
-                    {field: 'id', title: 'ID', width: 90, sort: true},
+                    {field: 'id', title: 'ID', width: 50, sort: true},
                     {field: 'name', title: '班级名', width: 100},
-                    {field: 'number', title: '班级人数', width: 70},
-                    {field: 'introduction', title: '班级介绍', width: 200},
+                    {field: 'number', title: '班级人数', width: 90},
+                    {field: 'introduction', title: '班级介绍', width: 150},
                     {field: 'teacherName', title: '班主任/辅导员', width: 150},
-                    {field: 'telephone', title: '班主任/辅导员电话', width: 200},
-                    {field: 'gradeName', title: '所属年级', width: 200},
-                    {field:'toolbar',title:'操作',width:400,toolbar: '#toolbar'}
+                    {field: 'telephone', title: '班主任/辅导员电话', width: 150},
+                    {field: 'email', title: '班主任/辅导员邮箱', width: 150},
+                    {field: 'gradeName', title: '所属年级', width: 120},
+                    {field:'toolbar',title:'操作',width:200,toolbar: '#toolbar'}
                 ]],
                 id: 'testReload',
                 even: true, //隔行背景
@@ -92,6 +93,7 @@
                         //value和值
                         $('#grade').append(new Option(item.name, item.name));// 下拉菜单里添加元素
                         $('#grade_add').append(new Option(item.name, item.name));// 下拉菜单里添加元素
+                        $('#grade_edit').append(new Option(item.name, item.name));// 下拉菜单里添加元素
                     });
                     layui.form.render("select");
                 }
@@ -101,7 +103,9 @@
 
             //搜索框，重载
             form.on('submit(search_btn)', function (data) {
+                //获取班级名
                 var name = $("#search_clazz").val();
+                //获取年级名
                 var grade = $("#grade option:selected").val();
                 console.log(grade+name);
                 /**
@@ -129,7 +133,8 @@
                         type:1,
                         title:'添加班级信息',
                         content:$("#addDialog"),
-                        area: ['500px']
+                        area: ['500px'],
+                        maxmin: true
 
                     });
                 } else if(layEvent === 'refresh'){ //刷新
@@ -178,14 +183,17 @@
                         title:'修改班级信息',
                         content:$("#editDialog"),
                         area: ['500px', '500px'],
+                        maxmin: true,
                         success : function(layero, index) {
-                            $("#EditId").val(data.id);
-                            $("#EditName").val(data.name);
-                            $("#EditTel").val(data.telephone);
-                            $("#EditAddress").val(data.address);
-                            $("#EditEmail").val(data.email);
-                            $("input[name=gender][value=男]").attr("checked", data.gender == "男" ? true : false);
-                            $("input[name=gender][value=女]").attr("checked", data.gender == "女" ? true : false);
+                            $("#editId").val(data.id);
+                            $("#editName").val(data.name);
+                            $("#editNumber").val(data.number);
+                            $("#editIntro").val(data.introduction);
+                            $("#editTeacher").val(data.teacherName);
+                            $("#editTel").val(data.telephone);
+                            $("#editEamil").val(data.email);
+                            //设置下拉框选中状态
+                            $("#grade_edit").find("option[value="+data.gradeName+"]").prop("selected",true);
                             form.render(); //更新全部
                         },
 
@@ -197,28 +205,77 @@
 
 
         });
-        layui.use('upload', function(){
-            var upload = layui.upload;
-
-            //执行实例
-            var uploadInst = upload.render({
-                elem: '#upload_photo' //绑定元素
-                ,url: '${pageContext.request.contextPath}/clazz/uploadPhoto' //上传接口
-                ,done: function(res){
-                    alert(res.code);
-                }
-                ,error: function(){
-                   alert("上传失败!");
-                }
-            });
-        });
-
 
     });
 
 
 </script>
 
+
+
+<!-- 修改信息窗口 -->
+<div id="editDialog"  style="display:none;">
+    <!-- 管理员信息表单 -->
+    <form id="editForm" class="layui-form" action="${pageContext.request.contextPath}/clazz/editClazz" method="post">
+        <input type="hidden" id="editId" name="id">
+        <div class="layui-form-item">
+            <label class="layui-form-label">班级名</label>
+            <div class="layui-input-inline">
+                <input type="text" id="editName" name="name" lay-verify="required" lay-reqtext="班级名是必填项，岂能为空？" placeholder="请输入班级名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">班级人数</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="editNumber" name="number"  placeholder="请输入班级人数" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">老师姓名</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="editTeacher" name="teacherName"  placeholder="请输入老师姓名" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">老师电话</label>
+                <div class="layui-input-inline">
+                    <input type="tel" id="editTel" name="telephone" lay-verify="required|phone" placeholder="请输入老师电话" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">邮箱</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="editEamil" name="email" lay-verify="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text">
+                <label class="layui-form-label">班级介绍</label>
+                <div class="layui-input-block">
+                    <textarea id="editIntro" name="introduction" placeholder="请输入内容" class="layui-textarea" style="width: 60% ;height: 20%"></textarea>
+                </div>
+            </div>
+
+            <div class="layui-input-inline">
+                <label class="layui-form-label">年级 :</label>
+                <div class="layui-input-block" >
+                    <select id="grade_edit" name="gradeName" lay-filter="grade" style="width: 190px;height:37px; border: 1px solid gold">
+                        <option value="17级">请选择:</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit_add">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 
 <!-- 添加信息窗口 -->
@@ -262,14 +319,14 @@
             <div class="layui-form-item layui-form-text">
                 <label class="layui-form-label">班级介绍</label>
                 <div class="layui-input-block">
-                    <textarea placeholder="请输入内容" class="layui-textarea" style="width: 60% ;height: 20%"></textarea>
+                    <textarea name="introduction" placeholder="请输入内容" class="layui-textarea" style="width: 60% ;height: 20%"></textarea>
                 </div>
             </div>
 
             <div class="layui-input-inline">
                 <label class="layui-form-label">年级 :</label>
                 <div class="layui-input-block" >
-                    <select id="grade_add" name="grade" lay-filter="grade" style="width: 190px;height:37px; border: 1px solid gold">
+                    <select id="grade_add" name="gradeName" lay-filter="grade" style="width: 190px;height:37px; border: 1px solid gold">
                         <option value="17级">请选择:</option>
                     </select>
                 </div>
@@ -283,69 +340,6 @@
         </div>
     </form>
 </div>
-
-
-<!-- 修改信息窗口 -->
-<div id="editDialog"  style="display:none;">
-    <!-- 管理员信息表单 -->
-    <form id="editForm" class="layui-form" action="${pageContext.request.contextPath}/clazz/editclazz" method="post">
-        <input id="EditId" type="hidden" name="id">
-        <div class="layui-form-item">
-            <label class="layui-form-label">管理员姓名</label>
-            <div class="layui-input-inline">
-                <input type="text" id="EditName" name="name"  autocomplete="off" class="layui-input">
-            </div>
-        </div>
-
-
-        <div class="layui-form-item">
-            <div class="layui-inline">
-                <label class="layui-form-label">电话</label>
-                <div class="layui-input-inline">
-                    <input type="tel" id="EditTel" name="telephone" lay-verify="required|phone" placeholder="请输入电话" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">邮箱</label>
-                <div class="layui-input-inline">
-                    <input type="text" id="EditEmail" name="email" lay-verify="email" placeholder="请输入邮箱" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-            <div class="layui-inline">
-                <label class="layui-form-label">地址</label>
-                <div class="layui-input-inline">
-                    <input type="text" id="EditAddress" name="address"  placeholder="请输入地址" autocomplete="off" class="layui-input">
-                </div>
-            </div>
-        </div>
-
-        <div class="layui-form-item">
-            <label class="layui-form-label">性别</label>
-            <div class="layui-input-block">
-                <input type="radio" id="edit_gender_man" name="gender" value="男" title="男">
-                <input type="radio" id="edit_gender_woman" name="gender" value="女" title="女">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">上传图片</label>
-            <div class="layui-input-inline">
-                <button type="button" class="layui-btn" id="upload_photo_edit">
-                    <i class="layui-icon">&#xe67c;</i>上传图片
-                </button>
-                <!-- 存储所上传的头像路径 -->
-                <input id="edit_portrait-path"  type="hidden" name="portraitPath"/>
-            </div>
-
-        </div>
-        <div class="layui-form-item">
-            <div class="layui-input-block">
-                <button type="submit" class="layui-btn" lay-submit="" lay-filter="submit_add">立即提交</button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-            </div>
-        </div>
-    </form>
-</div>
-
 
 </body>
 </html>

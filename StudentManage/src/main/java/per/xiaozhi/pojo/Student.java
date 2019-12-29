@@ -105,4 +105,34 @@ public class Student {
     public void setClazzName(String clazzName) {
         this.clazzName = clazzName;
     }
+
+    public Student(String sno, String name, String gender, String password, String email, String telephone, String address, String introduction, String portraitPath, String clazzName) {
+        this.sno = sno;
+        this.name = name;
+        this.gender = gender;
+        this.password = password;
+        this.email = email;
+        this.telephone = telephone;
+        this.address = address;
+        this.introduction = introduction;
+        this.portraitPath = portraitPath;
+        this.clazzName = clazzName;
+    }
+
+    public Student(Integer id, String sno, String name, String gender, String password, String email, String telephone, String address, String introduction, String portraitPath, String clazzName) {
+        this.id = id;
+        this.sno = sno;
+        this.name = name;
+        this.gender = gender;
+        this.password = password;
+        this.email = email;
+        this.telephone = telephone;
+        this.address = address;
+        this.introduction = introduction;
+        this.portraitPath = portraitPath;
+        this.clazzName = clazzName;
+    }
+
+    public Student() {
+    }
 }

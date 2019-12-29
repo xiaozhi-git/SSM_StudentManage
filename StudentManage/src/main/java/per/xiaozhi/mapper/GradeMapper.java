@@ -5,19 +5,20 @@ package per.xiaozhi.mapper;/*
  *
  */
 
+import org.apache.ibatis.annotations.Param;
 import per.xiaozhi.pojo.Grade;
 
 import java.util.List;
 
 public interface GradeMapper {
     // 根据年级名称查询指定/全部年级信息列表
-    List<Grade> selectList(String gradename);
+    List<Grade> selectList(@Param("name") String name);
 
     // 查询所有年级信息列表(用于在班级管理页面中获取年级信息)
     List<Grade> selectAll();
 
     //根据年级名称查询指定的年级信息
-    Grade findByName(String gradename);
+    Grade findByName(String name);
 
     //  添加年级信息
     int insert(Grade grade);

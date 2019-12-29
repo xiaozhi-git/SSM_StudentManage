@@ -16,15 +16,13 @@
     <!-- 加载注解驱动 -->
     <mvc:annotation-driven/>
 
-    <!-- 处理静态资源
-    <mvc:default-servlet-handler/>-->
-    <mvc:resources mapping="/static/**" location="/static/" /><!--注:static为我的静态资源文件夹-->
+    <!-- 处理静态资源-->
+    <mvc:default-servlet-handler/>
 
     <!-- 配置拦截器 -->
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**"/>
-            <mvc:exclude-mapping path="/static/layui/**"/>
             <mvc:exclude-mapping path="/static/**/**"/>
             <mvc:exclude-mapping path="/system/goRegister"/>
             <mvc:exclude-mapping path="/system/login"/>

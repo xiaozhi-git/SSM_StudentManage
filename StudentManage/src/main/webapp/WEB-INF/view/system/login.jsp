@@ -31,10 +31,12 @@
         $('#loginBtn').click(function () {
             login();
         });
-        // 注册事件
-        $('#loginRegister').click(function () {
-            register();
+
+        //监听重置点击事件
+        $("#reBtn").click(function () {
+            $('#form')[0].reset()
         });
+
     });
     // 生成验证码
     function createCode(codeID) {
@@ -115,18 +117,17 @@
                     if (data.success){
                         window.location.href = "${pageContext.request.contextPath}/system/goSystemMainView";//进入系统主页面
                     }else {
-                        $.messager.alert("提示", data.msg);
+                        alert(data.msg);
                     }
                 },
-                error:function () {
+                error:function (data) {
                     layer.close(loginLoadIndex);
                     $('#loginBtn').val("登录");
-                    alert("无法登陆!")
+                    alert(data.msg);
 
                 }
             });
         }
-
     }
 </script>
 <body>
@@ -182,9 +183,10 @@
             </div>
 
             <div class="usernameWrapDiv">
-                <div class="submitLabel">
-                    <label>没有账号？<a href="/system/goRegister">点击注册</a></label>
+                <div class="submitDiv" style="margin-left: 70px">
+                    <input id="reBtn" type="button" class="submit layui-btn layui-btn-primary" value="重置"></input>
                 </div>
+
                 <div class="submitDiv">
                     <input id="loginBtn" type="button" class="submit layui-btn layui-btn-primary" value="登录"></input>
                 </div>

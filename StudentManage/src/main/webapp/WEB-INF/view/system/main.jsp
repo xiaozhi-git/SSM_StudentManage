@@ -8,7 +8,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!-- use EL-Expression-->
 <%@ page isELIgnored="false" %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title>学生管理|主页面</title>
@@ -25,22 +24,42 @@
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
     <div class="layui-header">
-        <div class="layui-logo">学生管理系统</div>
+        <div class="layui-logo" >学生管理系统</div>
         <ul class="layui-nav layui-layout-right">
             <li class="layui-nav-item">
                 <a href="javascript:;">
                     <!-- 获取用户登录类型 -->
                     <c:choose>
                         <c:when test="${userType==1 }">管理员 : </c:when>
-                        <c:when test="${userType==2 }">学生 : </c:when>
-                        <c:when test="${userType==3}">教师 : </c:when>
+                        <c:when test="${userType==3 }">学生 : </c:when>
+                        <c:when test="${userType==2}">教师 : </c:when>
                     </c:choose>
                     <%-- 从Session中获取登录用户的用户名	--%>
                     <span style="color:red; font-weight:bold;">${user.name}</span>
                 </a>
-                <dl class="layui-nav-child">
-                    <dd><a href="">修改密码</a></dd>
-                </dl>
+                <c:if test="${msg==1}">
+                    <script>
+                        alert("修改成功!即将退出，重新登陆!");
+                        window.location.href = "${pageContext.request.contextPath}/system/logout";
+                    </script>
+                </c:if>
+                <c:choose>
+                    <c:when test="${userType==1 }">
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" onclick="updateAdminPassword();">修改密码</a></dd>
+                        </dl>
+                    </c:when>
+                    <c:when test="${userType==3 }">
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" onclick="updateStudentPassword();">修改密码</a></dd>
+                        </dl>
+                    </c:when>
+                    <c:when test="${userType==2}">
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:;" onclick="updateTeacherPassword();">修改密码</a></dd>
+                        </dl>
+                    </c:when>
+                </c:choose>
             </li>
             <li class="layui-nav-item"><a href="/system/logout">退出</a></li>
         </ul>
@@ -94,6 +113,7 @@
         <ul class="layui-tab-title">
             <li class="layui-this">系统首页</li>
         </ul>
+        <%--tab显示--%>
         <div class="layui-tab-content">
             <div class="layui-tab-item layui-show">
                 <jsp:include page="intro.jsp"></jsp:include>
@@ -101,16 +121,18 @@
         </div>
     </div>
 
-    <div class="layui-footer" align="center">
+    <div class="layui-footer" style="height: 45px" align="center">
         <!-- 底部固定区域 -->
         学生信息管理平台 &copy person.小智 | 版权所有
     </div>
 </div>
 <script>
     //JavaScript代码区域
-    layui.use(['element', 'layer', 'jquery'], function () {
-        var element = layui.element;
-        var $ = layui.$;
+    layui.use(['element', 'layer','form', 'jquery'], function () {
+        var $ = layui.jquery;//jQuery
+        var form = layui.form;//表单
+        var element = layui.element;//元素
+        var layer = layui.layer;//弹出层
 
         // 配置tab实践在下面无法获取到菜单元素
         $('.site-demo-active').on('click', function () {
@@ -144,7 +166,7 @@
                 //关于tabAdd的方法所传入的参数可看layui的开发文档中基础方法部分
                 element.tabAdd('demo', {
                     title: name,
-                    content: '<iframe data-frameid="' + id + '" scrolling="auto" frameborder="0" src="' + url + '" style="width:100%;height:100%;"></iframe>',
+                    content: '<iframe data-frameid="' + id + '" scrolling="auto" frameborder="0" src="' + url + '" style="width:100%;height:99%;"></iframe>',
                     id: id //规定好的id
                 })
                 FrameWH();  //计算ifram层的大小
@@ -161,7 +183,133 @@
             var h = $(window).height();
             $("iframe").css("height",h+"px");
         }
+
     });
+
+
+    function updateAdminPassword() {
+        layer.open({
+            type:1,
+            title:'修改密码',
+            content:$("#editAdmin"),
+            area: ['350px', '300'],
+        });
+    }
+
+    //修改学生密码
+    function updateStudentPassword() {
+        layer.open({
+            type:1,
+            title:'修改密码',
+            content:$("#editStu"),
+            area: ['350px', '300']
+
+        });
+    }
+
+    //修改教师密码
+    function updateTeacherPassword() {
+        layer.open({
+            type:1,
+            title:'修改密码',
+            content:$("#editTea"),
+            area: ['350px', '300']
+
+        });
+
+    }
+
 </script>
+
+
+
+
+<!-- 修改密码窗口 -->
+<div id="editAdmin"  style="display:none;">
+    <!-- 管理员信息表单 -->
+    <form id="editAdminForm" class="layui-form" action="${pageContext.request.contextPath}/admin/editAdminPassword" method="post">
+        <div class="layui-form-item">
+            <input type="hidden" id="adminId" name="id" value="${user.id}">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">管理员姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" value="${user.name}" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input type="password" id="pwd" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submitlay-filter="submit_edit_admin">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="editStu"  style="display:none;">
+    <!-- 学生信息表单 -->
+    <form id="editStuForm" class="layui-form" action="${pageContext.request.contextPath}/student/editStudentPassword" method="post">
+        <div class="layui-form-item">
+            <input type="hidden" name="id" value="${user.id}">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">学生姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" value="${user.name}" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" lay-verify="required" lay-reqtext="密码是必填项" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="submit_edit_stu">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div id="editTea"  style="display:none;">
+    <!-- 教师信息表单 -->
+    <form id="editTeaForm" class="layui-form" action="${pageContext.request.contextPath}/teacher/editTeacherPassword" method="post">
+        <div class="layui-form-item">
+            <input type="hidden"  name="id" value="${user.id}">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">教师姓名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="name" value="${user.name}" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" lay-verify="required" lay-reqtext="密码是必填项" placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="submit_edit_tea">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
 </body>
 </html>

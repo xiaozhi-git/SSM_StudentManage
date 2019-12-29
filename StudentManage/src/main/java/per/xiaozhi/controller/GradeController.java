@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import per.xiaozhi.pojo.Admin;
+import per.xiaozhi.pojo.Clazz;
 import per.xiaozhi.pojo.Grade;
 import per.xiaozhi.service.AdminService;
 import per.xiaozhi.service.GradeService;
@@ -36,16 +37,17 @@ public class GradeController {
     }
 
 
-    /**
-     * @description: 分页查询:根据管理员姓名获取指定/所有管理员信息列表
-     * @param: page 当前页码
-     * @param: limit 列表行数
-     * @param: username 管理员姓名
-     * @return: java.util.Map<java.lang.String, java.lang.Object>
-     */
-    @PostMapping("/getGradeList")
+    /*
+     *Created by IntelliJ IDEA
+     * @description: 根据年级名模糊查询
+     * @date: 2019/12/26-15:39
+     * @auther: xiaozhi
+     *
+    */
+    @RequestMapping("/getGradeList")
     @ResponseBody
     public Map<String, Object> getGradeList(Integer page, Integer limit, String name) {
+        System.out.println(name);
 
         //设置每页的记录数
         PageHelper.startPage(page, limit);
@@ -67,12 +69,12 @@ public class GradeController {
 
     /*
      *Created by IntelliJ IDEA
-     * @description: 获取所有
+     * @description: 获取所有不分页
      * @date: 2019/12/25-22:20
      * @auther: xiaozhi
      *
     */
-    @PostMapping("/getAllGradeList")
+    @RequestMapping("/getAllGradeList")
     @ResponseBody
     public Map<String, Object> getAllGradeList() {
         List<Grade> list = gradeService.selectAll();
@@ -80,6 +82,70 @@ public class GradeController {
         result.put("data", list);
         return result;
     }
+
+    @RequestMapping("/getAllGradeListWithPage")
+    @ResponseBody
+    public Map<String, Object> getAllGradeListWithPage(Integer page, Integer limit) {
+        //设置每页的记录数
+        PageHelper.startPage(page, limit);
+        //根据姓名获取指定或所有管理员列表信息
+        List<Grade> list = gradeService.selectAll();
+        //封装查询结果
+        PageInfo<Grade> pageInfo = new PageInfo<>(list);
+        //获取总记录数
+        long total = pageInfo.getTotal();
+        //获取当前页数据列表
+        List<Grade> gradeList = pageInfo.getList();
+        result.put("code",0);
+        result.put("msg","查询成功!");
+        result.put("count", total);
+        result.put("data", gradeList);
+        return result;
+    }
+
+    /*
+     *Created by IntelliJ IDEA
+     * @description: 删除年级
+     * @date: 2019/12/26-15:48
+     * @auther: xiaozhi
+     *
+    */
+    @RequestMapping("/delete")
+    @ResponseBody
+    public Map<String, Object>delete(Integer id) {
+        int i = gradeService.deleteById(id);
+        if (i>0){
+            //存储对象数据
+            result.put("code",200);
+            result.put("msg","删除成功!");
+        }
+        return result;
+    }
+
+    @RequestMapping("/addGrade")
+    public String addGrade(String name, String manager, String email, String telephone,String  introduction) {
+       Grade grade = new Grade(name, manager, email, telephone, introduction);
+        int count = gradeService.insert(grade);
+        //存储对象数据
+        if (count>0){
+            return "grade/gradeList";
+        }
+        return "error/404";
+    }
+
+    @RequestMapping("/editGrade")
+    public String editGrade(Integer id,String name, String manager,String email, String telephone, String introduction) {
+        Grade grade = new Grade(id,name, manager, email, telephone, introduction);
+
+        int count = gradeService.update(grade);
+        //存储对象数据
+        if (count>0){
+            return "grade/gradeList";
+        }
+        return "error/404";
+    }
+
+
 
 
 

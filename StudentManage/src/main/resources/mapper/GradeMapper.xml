@@ -42,7 +42,7 @@
         WHERE id = #{id}
     </update>
 
-    <!-- 根据id批量删除指定的年级信息 -->
+    <!-- 根据id删除指定的年级信息 -->
     <delete id="deleteById">
         DELETE FROM ssm_student.tb_grade WHERE id=#{id}
     </delete>

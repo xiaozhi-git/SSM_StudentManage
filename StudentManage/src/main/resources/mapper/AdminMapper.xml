@@ -33,10 +33,7 @@
         telephone,
         address,
         portraitPath
-        from ssm_student.tb_admin where 1=1
-        <if test="name != null and name !='' ">
-            and name=#{name }
-        </if>
+        from ssm_student.tb_admin where name=#{name }
     </select>
     <!-- 添加管理员信息 -->
     <insert id="insert" parameterType="admin">

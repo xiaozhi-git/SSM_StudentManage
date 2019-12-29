@@ -11,85 +11,105 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import per.xiaozhi.pojo.Admin;
-import per.xiaozhi.service.AdminService;
+import per.xiaozhi.pojo.Grade;
+import per.xiaozhi.pojo.Student;
+import per.xiaozhi.pojo.Teacher;
+import per.xiaozhi.service.StudentService;
+import per.xiaozhi.service.TeacherService;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Controller
-@RequestMapping("admin")
-public class AdminController {
+@RequestMapping("teacher")
+public class teacherController {
     //存储返回给页面的对象数据
     private Map<String, Object> result = new HashMap<>();
     @Autowired
-    AdminService adminService;
+    TeacherService teacherService;
 
 
-    @RequestMapping("/goAdminListView")
+    @RequestMapping("/goTeacherListView")
     public String goAdminListView(){
-        return "admin/adminList";
+        return "teacher/teacherList";
     }
 
 
-    /**
-     * @description: 分页查询:根据管理员姓名获取指定/所有管理员信息列表
-     * @param: page 当前页码
-     * @param: limit 列表行数
-     * @param: username 管理员姓名
-     * @return: java.util.Map<java.lang.String, java.lang.Object>
-     */
-    @PostMapping("/getAdminList")
+    /*
+     *Created by IntelliJ IDEA
+     * @description:根据班级与学生名获取学生信息
+     * 也可以查询所有
+     * @date: 2019/12/26-16:58
+     * @auther: xiaozhi
+     *
+    */
+    @PostMapping("/getTeacherList")
     @ResponseBody
-    public Map<String, Object> getAdminList(Integer page, Integer limit, String username) {
+    public Map<String, Object> getTeacherList(Integer page, Integer limit, String username,String clazz) {
+
+        System.out.println("教师名"+username+"班级名"+clazz);
 
         //获取查询的用户名
-        Admin admin = new Admin();
-        admin.setName(username);
+        Teacher teacher = new Teacher();
+        teacher.setName(username);
+        teacher.setClazzName(clazz);
         //设置每页的记录数
         PageHelper.startPage(page, limit);
         //根据姓名获取指定或所有管理员列表信息
-        List<Admin> list = adminService.selectList(admin);
+        List<Teacher> list = teacherService.selectList(teacher);
         //封装查询结果
-        PageInfo<Admin> pageInfo = new PageInfo<>(list);
+        PageInfo<Teacher> pageInfo = new PageInfo<>(list);
         //获取总记录数
         long total = pageInfo.getTotal();
         //获取当前页数据列表
-        List<Admin> clazzList = pageInfo.getList();
+        List<Teacher> teacherList = pageInfo.getList();
         //存储对象数据
         result.put("code",0);
         result.put("msg","查询成功!");
         result.put("count", total);
-        result.put("data", clazzList);
+        result.put("data", teacherList);
         return result;
     }
 
-    @RequestMapping("/addAdmin")
-    public String addAdmin(String name, String gender, String password,String email,String telephone,String address,String portraitPath) {
-        System.out.println(name+gender+portraitPath);
-        Admin admin = new Admin(name,gender,password,email,telephone,address,portraitPath);
-        int count = adminService.insert(admin);
+
+    @RequestMapping("/addTeacher")
+    public String addTeacher(String tno,String name,String gender,String password, String email, String telephone, String address, String portraitPath,String clazzName) {
+        Teacher teacher = new Teacher(tno,name,gender,password,email,telephone,address,portraitPath,clazzName);
+        int count = teacherService.insert(teacher);
         //存储对象数据
        if (count>0){
-           return "admin/adminList";
+           return "teacher/teacherList";
        }
        return "error/404";
     }
 
-    @RequestMapping("/editAdmin")
-    public String editAdmin(Integer id,String name, String gender, String email,String telephone,String address,String portraitPath) {
-        System.out.println(name+gender+portraitPath);
-        Admin admin = new Admin(id,name,gender,email,telephone,address,portraitPath);
-        int count = adminService.update(admin);
+    @RequestMapping("/editTeacher")
+    public String editTeacher(Integer id,String tno,String name,String gender,String password, String email, String telephone, String address, String portraitPath,String clazzName) {
+        Teacher teacher = new Teacher(id,tno,name,gender,password,email,telephone,address,portraitPath,clazzName);
+        int count = teacherService.update(teacher);
         //存储对象数据
         if (count>0){
-            return "admin/adminList";
+            return "teacher/teacherList";
+        }
+        return "error/404";
+    }
+
+    //修改密码
+    @RequestMapping("/editTeacherPassword")
+    public String editTeacherPassword(Integer id, String password,HttpServletRequest request) {
+        Teacher teacher = new Teacher();
+        teacher.setPassword(password);
+        teacher.setId(id);
+        int count = teacherService.updatePassowrd(teacher);
+        //存储对象数据
+        if (count>0){
+          request.setAttribute("msg",1);
+          return "system/main";
         }
         return "error/404";
     }
@@ -97,7 +117,7 @@ public class AdminController {
     @PostMapping("/delete")
     @ResponseBody
     public Map<String, Object>delete(Integer id) {
-        int i = adminService.deleteById(id);
+        int i = teacherService.deleteById(id);
         if (i>0){
             //存储对象数据
             result.put("code",200);
@@ -105,22 +125,6 @@ public class AdminController {
         }
         return result;
     }
-
-    //修改密码
-    @RequestMapping("/editAdminPassword")
-    public String editAdminPassword(Integer id, String password,HttpServletRequest request) {
-        Admin admin = new Admin();
-        admin.setPassword(password);
-        admin.setId(id);
-        int count = adminService.updatePassowrd(admin);
-        //存储对象数据
-        if (count>0){
-            request.setAttribute("msg",1);
-            return "system/main";
-        }
-        return "error/404";
-    }
-
 
     //图片上传控制器
     @RequestMapping(value = "/uploadFile" , method = RequestMethod.POST)
@@ -157,6 +161,7 @@ public class AdminController {
         res.put("data", tempFile.getName());
         return res;
     }
+
 
 
 }

@@ -18,9 +18,6 @@ public interface StudentMapper {
     //  根据班级与学生名获取指定或全部学生信息列表
     List<Student> selectList(Student student);
 
-    // 根据学号查询指定学生信息
-    Student findBySno(Student student);
-
     //  添加班级信息
     int insert(Student student);
 

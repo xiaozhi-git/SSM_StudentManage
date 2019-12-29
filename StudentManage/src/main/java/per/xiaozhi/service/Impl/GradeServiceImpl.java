@@ -19,8 +19,8 @@ public class GradeServiceImpl implements GradeService {
 
 
     @Override
-    public List<Grade> selectList(String gradename) {
-        return gradeMapper.selectList(gradename);
+    public List<Grade> selectList(String name) {
+        return gradeMapper.selectList(name);
     }
 
     @Override
@@ -29,8 +29,8 @@ public class GradeServiceImpl implements GradeService {
     }
 
     @Override
-    public Grade findByName(String gradename) {
-        return gradeMapper.findByName(gradename);
+    public Grade findByName(String name) {
+        return gradeMapper.findByName(name);
     }
 
     @Override

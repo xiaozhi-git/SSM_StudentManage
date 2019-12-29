@@ -55,6 +55,7 @@ public class SystemController {
     public void loginOut(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().removeAttribute("user");
         request.getSession().removeAttribute("userType");
+        request.getSession().removeAttribute("userName");
 
         //注销后重定向到登录页面
         try {
@@ -74,11 +75,12 @@ public class SystemController {
             //管理员
             case 1:
                 try {
-                    Admin clazz = adminService.login(loginForm);//验证账户和密码是否存在
-                    if (clazz != null) {
+                    Admin admin = adminService.login(loginForm);//验证账户和密码是否存在
+                    if (admin != null) {
                         HttpSession session = request.getSession(); //将用户信息存储到Session
-                        session.setAttribute("user", clazz);
+                        session.setAttribute("user", admin);
                         session.setAttribute("userType", loginForm.getUserType());
+                        session.setAttribute("userName",admin.getName());
                         result.put("success", true);
                         return result;
                     }
@@ -97,6 +99,7 @@ public class SystemController {
                         HttpSession session = request.getSession(); //将用户信息存储到Session
                         session.setAttribute("user", teacher);
                         session.setAttribute("userType", loginForm.getUserType());
+                        session.setAttribute("userName",teacher.getName());
                         result.put("success", true);
                         return result;
                     }
@@ -115,6 +118,7 @@ public class SystemController {
                         HttpSession session = request.getSession(); //将用户信息存储到Session
                         session.setAttribute("user", student);
                         session.setAttribute("userType", loginForm.getUserType());
+                        session.setAttribute("userName",student.getName());
                         result.put("success", true);
                         return result;
                     }
@@ -132,67 +136,78 @@ public class SystemController {
         return result;
     }
 
-    @RequestMapping("/register")
+    @RequestMapping("/updatePassword")
     @ResponseBody
-    public Map<String,Object> register(@RequestBody RegisterForm registerForm){
-        System.out.println(registerForm.getName()+registerForm.getPassword()+registerForm.getUserType());
+    public Map<String,Object> updatePassword(Integer id,String name, String password,String oldPassword, HttpServletRequest request){
         //存储返回给页面的对象数据
         Map<String, Object> result = new HashMap<>();
-        switch (registerForm.getUserType()){
-            case 1:
-                //管理员
-                try {
-                    Admin admin = new Admin();
-                    admin.setName(registerForm.getName());
-                    admin.setPassword(registerForm.getPassword());
-                    if (adminService.insert(admin)!=0){
-                        result.put("success", true);
-                        return result;
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    result.put("success", false);
-                    result.put("msg", "抱歉，注册失败，请重试!!");
-                    return result;
+
+        //判断当前登录用户的用户类型
+        int userType = Integer.parseInt(request.getSession().getAttribute("userType").toString());
+        //管理员身份
+        if (userType == 1) {
+            Admin admin = adminService.findByName(name);
+            if (!admin.getPassword().equals(oldPassword)) {
+                result.put("success", false);
+                result.put("msg", "原密码错误!");
+                return result;
+            }
+            try {
+                //修改密码
+                admin.setPassword(password);//覆盖旧密码值,存储待更新的密码
+                admin.setId(id);
+                if (adminService.updatePassowrd(admin) > 0) {
+                    result.put("success", true);
                 }
-                break;
-            case 2:
-                //教师
-                try {
-                    Teacher teacher = new Teacher();
-                    teacher.setName(registerForm.getName());
-                    teacher.setPassword(registerForm.getPassword());
-                    if (teacherService.insert(teacher)!=0){
-                        result.put("success", true);
-                        return result;
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    result.put("success", false);
-                    result.put("msg", "抱歉，注册失败，请重试!!");
-                    return result;
-                }
-                break;
-            case 3:
-                //学生
-                try {
-                    Student student = new Student();
-                    student.setName(registerForm.getName());
-                    student.setPassword(registerForm.getPassword());
-                    if (studentService.insert(student)!=0){
-                        result.put("success", true);
-                        return result;
-                    }
-                }catch (Exception e){
-                    e.printStackTrace();
-                    result.put("success", false);
-                    result.put("msg", "抱歉，注册失败，请重试!!");
-                    return result;
-                }
-                break;
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("success", false);
+                result.put("msg", "修改失败! 服务器端发生异常!");
+            }
         }
-        result.put("success", false);
-        result.put("msg", "抱歉，注册失败，请重试!");
+
+        //教师身份
+        if (userType == 2) {
+            Teacher teacher = (Teacher) request.getSession().getAttribute("user");
+            if (!teacher.getPassword().equals(oldPassword)) {
+                result.put("success", false);
+                result.put("msg", "原密码错误!");
+                return result;
+            }
+            try {
+                teacher.setPassword(password);
+                teacher.setId(id);
+                if (teacherService.updatePassowrd(teacher) > 0) {
+                    result.put("success", true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("success", false);
+                result.put("msg", "修改失败! 服务器端发生异常!");
+            }
+        }
+
+        //学生身份
+        if (userType == 3) {
+            Student student = (Student) request.getSession().getAttribute("user");
+            if (!student.getPassword().equals(oldPassword)) {
+                result.put("success", false);
+                result.put("msg", "原密码错误!");
+                return result;
+            }
+            try {
+                student.setPassword(password);
+                student.setId(id);
+                if (studentService.updatePassowrd(student) > 0) {
+                    result.put("success", true);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                result.put("success", false);
+                result.put("msg", "修改失败! 服务器端发生异常!");
+            }
+        }
         return result;
     }
+
 }

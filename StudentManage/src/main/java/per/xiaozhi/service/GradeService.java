@@ -14,13 +14,13 @@ import java.util.List;
 public interface GradeService {
 
     // 根据年级名称查询指定/全部年级列表信息
-    List<Grade> selectList(String gradename);
+    List<Grade> selectList(String name);
 
     // 查询所有年级列表信息(用于在班级管理页面中获取年级信息)
     List<Grade> selectAll();
 
     // 根据年级名称查询指定年级信息
-    Grade findByName(String gradename);
+    Grade findByName(String name);
 
     // 添加年级信息
     int insert(Grade grade);
